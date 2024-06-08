@@ -1,0 +1,18 @@
+{
+  "name": "Flask AI Starter",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "forwardPorts": [5001, 5432],
+  "postCreateCommand": "bash .devcontainer/set-up-environment.sh",
+  "runArgs": [
+    "--mount",
+    "type=volume,target=${containerWorkspaceFolder}/.idea",
+    "--mount",
+    "type=volume,target=${containerWorkspaceFolder}/venv"
+  ],
+  "workspaceFolder": "/workspace",
+  "containerEnv": {
+    "DATABASE_URL": "postgresql://localhost:5432/ai_starter_development?user=ai_starter&password=ai_starter",
+    "USE_FLASK_DEBUG_MODE": "true"
+  }
+}
