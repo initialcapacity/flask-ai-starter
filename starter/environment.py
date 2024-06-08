@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -7,6 +8,7 @@ class Environment:
     port: int
     database_url: str
     use_flask_debug_mode: bool
+    feeds: List[str]
 
     @classmethod
     def from_env(cls) -> 'Environment':
@@ -14,6 +16,7 @@ class Environment:
             port=int(os.environ.get('PORT', 5001)),
             database_url=cls.__require_env('DATABASE_URL'),
             use_flask_debug_mode=os.environ.get('USE_FLASK_DEBUG_MODE', 'false') == 'true',
+            feeds=cls.__require_env('FEEDS').strip().split(','),
         )
 
     @classmethod
