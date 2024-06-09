@@ -7,8 +7,9 @@ from starter.documents.chunks_gateway import ChunksGateway
 from starter.documents.documents_gateway import DocumentsGateway
 from starter.search.embeddings_analyzer import EmbeddingsAnalyzer
 from starter.search.embeddings_gateway import EmbeddingsGateway
+from starter.search.vector_support import vector_to_string
 from tests.db_test_support import TestDatabaseTemplate
-from tests.embeddings_support import embedding_response, vector_to_string, embedding_vector
+from tests.embeddings_support import embedding_response, embedding_vector
 
 
 class TestEmbeddingsAnalyzer(unittest.TestCase):
@@ -21,17 +22,13 @@ class TestEmbeddingsAnalyzer(unittest.TestCase):
         self.chunks_gateway = ChunksGateway(self.db)
         embeddings_gateway = EmbeddingsGateway(self.db)
         ai_client = OpenAIClient(base_url="https://openai.example.com", api_key="some-key",
-                                 model="text-embedding-3-small")
+                                 embeddings_model="text-embedding-3-small", chat_model="gpt-4o")
 
         self.analyzer = EmbeddingsAnalyzer(embeddings_gateway, self.chunks_gateway, ai_client)
 
     @responses.activate
     def test_analyze(self):
-        responses.add(
-            responses.POST,
-            "https://openai.example.com/embeddings",
-            embedding_response(2),
-        )
+        responses.add(responses.POST, "https://openai.example.com/embeddings", embedding_response(2))
         document_id = self.documents_gateway.create("https://example.com", "some_content")
         chunk_id_1 = self.chunks_gateway.create(document_id, "some_content_1")
         chunk_id_2 = self.chunks_gateway.create(document_id, "some_content_1")

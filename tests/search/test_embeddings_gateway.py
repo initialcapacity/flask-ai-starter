@@ -3,8 +3,9 @@ import unittest
 from starter.documents.chunks_gateway import ChunksGateway
 from starter.documents.documents_gateway import DocumentsGateway
 from starter.search.embeddings_gateway import EmbeddingsGateway
+from starter.search.vector_support import vector_to_string
 from tests.db_test_support import TestDatabaseTemplate
-from tests.embeddings_support import embedding_vector, vector_to_string
+from tests.embeddings_support import embedding_vector
 
 
 class TestEmbeddingsGateway(unittest.TestCase):
@@ -41,7 +42,7 @@ class TestEmbeddingsGateway(unittest.TestCase):
 
         self.assertEqual([chunk_id_2], ids)
 
-    def find_similar_chunk_id(self):
+    def test_find_similar_chunk_id(self):
         document_id = self.documents_gateway.create("https://example.com", "some_content")
         chunk_id_1 = self.chunks_gateway.create(document_id, "some_content_1")
         chunk_id_2 = self.chunks_gateway.create(document_id, "some_content_1")

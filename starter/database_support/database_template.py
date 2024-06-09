@@ -1,4 +1,4 @@
-from typing import Optional, Any, Callable, TypeVar, Generic
+from typing import Optional, Any, Callable, TypeVar
 
 import sqlalchemy
 from sqlalchemy import Engine, Connection, CursorResult

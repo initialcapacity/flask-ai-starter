@@ -37,3 +37,16 @@ class DocumentsGateway:
         )
 
         return map_one_result(result, lambda row: row["count"] > 0)
+
+    def find(self, id: UUID, connection: Optional[Connection] = None) -> DocumentRecord:
+        result = self.template.query(
+            "select id, source, content from documents where id = :id",
+            connection,
+            id=id,
+        )
+
+        return map_one_result(result, lambda row: DocumentRecord(
+            id=row["id"],
+            source=row["source"],
+            content=row["content"],
+        ))

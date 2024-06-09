@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from starter.documents.documents_gateway import DocumentsGateway
+from starter.documents.documents_gateway import DocumentsGateway, DocumentRecord
 from tests.db_test_support import TestDatabaseTemplate
 
 
@@ -16,7 +16,6 @@ class TestDocumentsGateway(TestCase):
         id = self.gateway.create("https://example.com", "some content")
 
         result = self.db.query_to_dict("select id, source, content from documents")
-
         self.assertEqual([{
             "id": id,
             "source": "https://example.com",
@@ -28,3 +27,13 @@ class TestDocumentsGateway(TestCase):
 
         self.assertTrue(self.gateway.exists("https://example.com"))
         self.assertFalse(self.gateway.exists("https://not-there.example.com"))
+
+    def test_find(self):
+        id = self.gateway.create("https://example.com", "some content")
+
+        record = self.gateway.find(id)
+
+        self.assertEqual(
+            DocumentRecord(id, "https://example.com", "some content"),
+            record,
+        )

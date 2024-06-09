@@ -17,7 +17,8 @@ embeddings_gateway = EmbeddingsGateway(db_template)
 ai_client = OpenAIClient(
     base_url="https://api.openai.com/v1/",
     api_key=env.open_ai_key,
-    model="text-embedding-3-small",
+    embeddings_model="text-embedding-3-small",
+    chat_model="gpt-4o"
 )
 
 analyzer = EmbeddingsAnalyzer(embeddings_gateway, chunks_gateway, ai_client)

@@ -1,14 +1,16 @@
 from typing import List
 
+from starter.search.vector_support import vector_to_string
+
 
 def embedding_vector(one_index: int) -> List[float]:
+    """
+
+    :rtype: object
+    """
     vector = [0] * 1536
     vector[one_index] = 1
     return vector
-
-
-def vector_to_string(vector: List[float]) -> str:
-    return "[" + ",".join([str(v) for v in vector]) + "]"
 
 
 def embedding_response(one_index: int):

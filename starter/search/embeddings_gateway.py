@@ -5,6 +5,7 @@ from sqlalchemy import Connection
 
 from starter.database_support.database_template import DatabaseTemplate
 from starter.database_support.result_mapping import map_results, map_one_result
+from starter.search.vector_support import vector_to_string
 
 
 class EmbeddingsGateway:
@@ -33,7 +34,7 @@ class EmbeddingsGateway:
         result = self.template.query(
             """select e.chunk_id from embeddings e order by e.embedding <=> :vector limit 1""",
             connection,
-            vector=vector,
+            vector=vector_to_string(vector),
         )
 
         return map_one_result(result, lambda row: row["chunk_id"])
