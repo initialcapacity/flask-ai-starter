@@ -28,7 +28,7 @@ class TestEmbeddingsGateway(unittest.TestCase):
         self.assertEqual([{
             "id": id,
             "chunk_id": chunk_id,
-            "embedding": '[' + vector_to_string(vector) + ']',
+            "embedding": vector_to_string(vector),
         }], result)
 
     def test_unprocessed_chunk_ids(self):
