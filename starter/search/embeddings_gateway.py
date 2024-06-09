@@ -21,7 +21,7 @@ class EmbeddingsGateway:
 
         return map_one_result(result, lambda row: row["id"])
 
-    def unprocessed_chunk_ids(self, connection: Optional[Connection] = None) -> List[str]:
+    def unprocessed_chunk_ids(self, connection: Optional[Connection] = None) -> List[UUID]:
         result = self.template.query("""
             select chunks.id from chunks
                 left join public.embeddings e on chunks.id = e.chunk_id

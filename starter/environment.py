@@ -9,6 +9,7 @@ class Environment:
     database_url: str
     use_flask_debug_mode: bool
     feeds: List[str]
+    open_ai_key: str
 
     @classmethod
     def from_env(cls) -> 'Environment':
@@ -17,6 +18,7 @@ class Environment:
             database_url=cls.__require_env('DATABASE_URL'),
             use_flask_debug_mode=os.environ.get('USE_FLASK_DEBUG_MODE', 'false') == 'true',
             feeds=cls.__require_env('FEEDS').strip().split(','),
+            open_ai_key=cls.__require_env('OPEN_AI_KEY')
         )
 
     @classmethod
