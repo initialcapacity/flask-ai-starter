@@ -44,7 +44,7 @@ def upgrade() -> None:
     (
         id         uuid primary key                  default gen_random_uuid(),
         chunk_id   uuid references chunks (id),
-        embedding  vector(3072) not null,
+        embedding  vector(1536) not null,
         created_at timestamp with time zone not null default now()
     );
     grant all privileges on table embeddings to ai_starter;
