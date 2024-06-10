@@ -20,15 +20,32 @@ class TestOpenAIClient(unittest.TestCase):
     def test_fetch_embedding(self):
         responses.add(responses.POST, "https://openai.example.com/embeddings", embedding_response(2))
 
-        self.assertEqual(embedding_vector(2), self.client.fetch_embedding("some query"))
+        self.assertEqual(embedding_vector(2), self.client.fetch_embedding("some query").value)
 
     @responses.activate
-    def fetch_chat_completion(self):
+    def test_fetch_embedding_failure(self):
+        responses.add(responses.POST, "https://openai.example.com/embeddings", "bad news", status=400)
+
+        self.assertEqual("Failed to fetch embedding", self.client.fetch_embedding("some query").message)
+
+    @responses.activate
+    def test_fetch_chat_completion(self):
         responses.add(responses.POST, "https://openai.example.com/chat/completions", chat_response)
 
         self.assertEqual(
             "Sounds good to me",
             self.client.fetch_chat_completion([
                 ChatMessage(role="user", content="Sound good to you?")
-            ]),
+            ]).value,
+        )
+
+    @responses.activate
+    def test_fetch_chat_completion_failure(self):
+        responses.add(responses.POST, "https://openai.example.com/chat/completions", "bad news", status=400)
+
+        self.assertEqual(
+            "Failed to fetch completion",
+            self.client.fetch_chat_completion([
+                ChatMessage(role="user", content="Sound good to you?")
+            ]).message,
         )

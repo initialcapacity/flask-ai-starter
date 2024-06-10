@@ -14,6 +14,8 @@
   "containerEnv": {
     "DATABASE_URL": "postgresql://localhost:5432/ai_starter_development?user=ai_starter&password=ai_starter",
     "USE_FLASK_DEBUG_MODE": "true",
-    "FEEDS": "https://feed.infoq.com/development/,https://blog.jetbrains.com/feed/,https://feed.infoq.com/Devops/,https://feed.infoq.com/architecture-design/"
+    "FEEDS": "https://feed.infoq.com/development/,https://blog.jetbrains.com/feed/,https://feed.infoq.com/Devops/,https://feed.infoq.com/architecture-design/",
+    "ROOT_LOG_LEVEL": "INFO",
+    "STARTER_LOG_LEVEL": "DEBUG"
   }
 }

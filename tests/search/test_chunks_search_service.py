@@ -5,10 +5,11 @@ import responses
 from starter.ai.open_ai_client import OpenAIClient
 from starter.documents.chunks_gateway import ChunksGateway
 from starter.documents.documents_gateway import DocumentsGateway
-from starter.search.chunks_search_service import ChunksSearchService, ChunkSearchResult
+from starter.search.chunks_search_service import ChunksSearchService, ChunkSearchResponse
 from starter.search.embeddings_gateway import EmbeddingsGateway
 from tests.db_test_support import TestDatabaseTemplate
 from tests.embeddings_support import embedding_vector, embedding_response
+from tests.logging_support import disable_logging
 
 
 class TestChunksSearchService(unittest.TestCase):
@@ -23,15 +24,12 @@ class TestChunksSearchService(unittest.TestCase):
         ai_client = OpenAIClient(base_url="https://openai.example.com", api_key="some-key",
                                  embeddings_model="text-embedding-3-small", chat_model="gpt-4o")
 
-        self.service = ChunksSearchService(self.embeddings_gateway, self.chunks_gateway, self.documents_gateway, ai_client)
+        self.service = ChunksSearchService(self.embeddings_gateway, self.chunks_gateway,
+                                           self.documents_gateway, ai_client)
 
     @responses.activate
     def test_search_for_relevant_chunk(self):
-        responses.add(
-            responses.POST,
-            "https://openai.example.com/embeddings",
-            embedding_response(2),
-        )
+        responses.add(responses.POST, "https://openai.example.com/embeddings", embedding_response(2))
 
         document_id_1 = self.documents_gateway.create("https://example.com/1", "some_content_1")
         document_id_2 = self.documents_gateway.create("https://example.com/2", "some_content_2")
@@ -43,9 +41,18 @@ class TestChunksSearchService(unittest.TestCase):
         result = self.service.search_for_relevant_chunk("some query")
 
         self.assertEqual(
-            ChunkSearchResult(
+            ChunkSearchResponse(
                 content="some_content_2",
                 source="https://example.com/2",
             ),
-            result,
+            result.value,
         )
+
+    @disable_logging
+    @responses.activate
+    def test_search_for_relevant_chunk_failure(self):
+        responses.add(responses.POST, "https://openai.example.com/embeddings", "bad news", status=400)
+
+        result = self.service.search_for_relevant_chunk("some query")
+
+        self.assertEqual("Failed to find relevant chunk", result.message)

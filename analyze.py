@@ -1,3 +1,5 @@
+import logging
+
 import sqlalchemy
 
 from starter.ai.open_ai_client import OpenAIClient
@@ -8,6 +10,8 @@ from starter.search.embeddings_analyzer import EmbeddingsAnalyzer
 from starter.search.embeddings_gateway import EmbeddingsGateway
 
 env = Environment.from_env()
+logging.basicConfig(level=env.root_log_level)
+logging.getLogger('starter').setLevel(level=env.starter_log_level)
 
 db = sqlalchemy.create_engine(env.database_url, pool_size=4)
 db_template = DatabaseTemplate(db)
@@ -22,5 +26,4 @@ ai_client = OpenAIClient(
 )
 
 analyzer = EmbeddingsAnalyzer(embeddings_gateway, chunks_gateway, ai_client)
-
 analyzer.analyze()

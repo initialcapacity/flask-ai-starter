@@ -1,7 +1,12 @@
+import logging
 from dataclasses import dataclass
 from typing import List
 
 import requests
+
+from starter.result.result import Result, Failure, Success
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -17,8 +22,8 @@ class OpenAIClient:
         self.embeddings_model = embeddings_model
         self.chat_model = chat_model
 
-    def fetch_embedding(self, text) -> List[float]:
-        result = requests.post(
+    def fetch_embedding(self, text) -> Result[List[float]]:
+        response = requests.post(
             f"{self.base_url}/embeddings",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -30,11 +35,13 @@ class OpenAIClient:
                 "encoding_format": "float",
             },
         )
+        if not response.ok:
+            return Failure("Failed to fetch embedding")
 
-        return result.json()["data"][0]["embedding"]
+        return Success(response.json()["data"][0]["embedding"])
 
-    def fetch_chat_completion(self, messages: List[ChatMessage]) -> str:
-        result = requests.post(
+    def fetch_chat_completion(self, messages: List[ChatMessage]) -> Result[str]:
+        response = requests.post(
             f"{self.base_url}/chat/completions",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -47,5 +54,7 @@ class OpenAIClient:
                     for message in messages
                 ]},
         )
+        if not response.ok:
+            return Failure("Failed to fetch completion")
 
-        return result.json()["choices"][0]["message"]["content"]
+        return Success(response.json()["choices"][0]["message"]["content"])
