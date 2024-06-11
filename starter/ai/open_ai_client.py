@@ -36,6 +36,7 @@ class OpenAIClient:
             },
         )
         if not response.ok:
+            logger.error(f"Received {response.status_code} response from {self.base_url}: {response.text}")
             return Failure("Failed to fetch embedding")
 
         return Success(response.json()["data"][0]["embedding"])
@@ -55,6 +56,7 @@ class OpenAIClient:
                 ]},
         )
         if not response.ok:
+            logger.error(f"Received {response.status_code} response from {self.base_url}: {response.text}")
             return Failure("Failed to fetch completion")
 
         return Success(response.json()["choices"][0]["message"]["content"])

@@ -88,7 +88,7 @@ and uses pgvector to store the embeddings in PostgreSQL.
 
 The web application collects the user's query and creates an embedding with the OpenAI Embeddings API.
 It then searches the PostgreSQL for similar embeddings (using pgvector) and provides the corresponding chunk of text as
-context for a query to the [Azure AI Chat Completion API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#completions).
+context for a query to the [Azure AI Chat Completion API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions).
 
 ## Local development
 
@@ -113,7 +113,7 @@ context for a query to the [Azure AI Chat Completion API](https://learn.microsof
     [localhost:5001](http://localhost:5001).
 
     ```shell
-    python collector.py
-    python analyzer.py
+    python collect.py
+    python analyze.py
     python -m starter
     ```

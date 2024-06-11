@@ -5,6 +5,7 @@ import responses
 from starter.ai.open_ai_client import OpenAIClient, ChatMessage
 from tests.chat_support import chat_response
 from tests.embeddings_support import embedding_response, embedding_vector
+from tests.logging_support import disable_logging
 
 
 class TestOpenAIClient(unittest.TestCase):
@@ -22,6 +23,7 @@ class TestOpenAIClient(unittest.TestCase):
 
         self.assertEqual(embedding_vector(2), self.client.fetch_embedding("some query").value)
 
+    @disable_logging
     @responses.activate
     def test_fetch_embedding_failure(self):
         responses.add(responses.POST, "https://openai.example.com/embeddings", "bad news", status=400)
@@ -39,6 +41,7 @@ class TestOpenAIClient(unittest.TestCase):
             ]).value,
         )
 
+    @disable_logging
     @responses.activate
     def test_fetch_chat_completion_failure(self):
         responses.add(responses.POST, "https://openai.example.com/chat/completions", "bad news", status=400)
