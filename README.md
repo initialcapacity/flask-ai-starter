@@ -88,6 +88,11 @@ context for a query to the [OpenAI Chat Completion API](https://platform.openai.
 
 1.  Install [uv](https://formulae.brew.sh/formula/uv), [PostgreSQL 17](https://formulae.brew.sh/formula/postgresql@17),
     and [pgvector](https://formulae.brew.sh/formula/pgvector).
+    ```shell
+    brew install uv postgresql@17 pgvector
+    brew services run postgresql@17
+    ```
+
 1.  Set up environment variables.
     ```shell
     cp .env.example .env 
