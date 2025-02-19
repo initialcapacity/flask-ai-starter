@@ -1,4 +1,4 @@
-name: Tests
+name: Test and Build
 on: push
 jobs:
   test:
@@ -30,4 +30,8 @@ jobs:
           uv run alembic upgrade head
       - name: run tests
         run: |
-          uv run -m unittest  
+          uv run -m unittest
+      - name: build container
+        run: |
+          uv pip compile pyproject.toml -o requirements.txt
+          docker build -t flask-ai-starter:${{ github.sha }} .  

@@ -117,3 +117,18 @@ context for a query to the [OpenAI Chat Completion API](https://platform.openai.
     uv run -m starter.analyze
     uv run -m starter
     ```
+
+## Build container
+
+1.  Build container
+    ```shell
+    uv pip compile pyproject.toml -o requirements.txt
+    docker build -t flask-ai-starter .
+    ```
+
+1.  Run with docker
+    ```shell
+    docker run --env-file .env.docker flask-ai-starter  ./collect.sh
+    docker run --env-file .env.docker flask-ai-starter  ./analyze.sh
+    docker run -p 8081:8081 --env-file .env.docker flask-ai-starter
+    ```   
