@@ -98,12 +98,14 @@ context for a query to the [OpenAI Chat Completion API](https://platform.openai.
     cp .env.example .env 
     source .env
     ```
+
 1.  Set up the database.
     ```shell
     psql postgres < databases/create_databases.sql
     uv run alembic upgrade head
     DATABASE_URL="postgresql://localhost:5432/ai_starter_test?user=ai_starter&password=ai_starter" uv run alembic upgrade head
     ```
+
 1.  Run tests.
     ```shell
     uv run -m unittest
@@ -111,7 +113,6 @@ context for a query to the [OpenAI Chat Completion API](https://platform.openai.
 
 1.  Run the collector and the analyzer to populate the database, then run the app and navigate to
     [localhost:5001](http://localhost:5001).
-
     ```shell
     uv run -m starter.collect
     uv run -m starter.analyze
