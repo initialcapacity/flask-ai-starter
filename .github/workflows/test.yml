@@ -26,7 +26,7 @@ jobs:
         env:
           DATABASE_URL: 'postgresql://localhost:5432/ai_starter_test?user=ai_starter&password=ai_starter'
         run: |
-          psql --host localhost --username postgresql < databases/create_databases.sql
+          psql --host localhost --username postgres < databases/create_databases.sql
           uv run alembic upgrade head
       - name: run tests
         run: |
