@@ -3,12 +3,31 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
-      - name: Run tests
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          runCmd: |
-            source venv/bin/activate
-            python -m unittest  
+      - name: install uv
+        uses: astral-sh/setup-uv@v5
+      - name: install dependencies
+        run: |
+          uv sync
+      - name: create test database
+        env:
+          DATABASE_URL: 'postgresql://localhost:5432/ai_starter_test?user=ai_starter&password=ai_starter'
+        run: |
+          psql --host localhost --username postgresql < databases/create_databases.sql
+          uv run alembic upgrade head
+      - name: run tests
+        run: |
+          uv run -m unittest  

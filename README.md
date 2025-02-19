@@ -4,17 +4,11 @@ A starter application that shows a data collector architecture for [retrieval au
 
 ## Technology stack
 
-This codebase is written [Python](https://www.python.org/) and runs on Azure's [Container Apps](https://azure.microsoft.com/en-us/products/container-apps) and
-[Functions](https://azure.microsoft.com/en-us/products/functions).
-It uses [Flask](https://flask.palletsprojects.com/) and [Jinja2 Templates](https://jinja.palletsprojects.com/templates/)
-with the [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference).
+This codebase is written [Python](https://www.python.org/) and uses [Flask](https://flask.palletsprojects.com/) and
+[Jinja2 Templates](https://jinja.palletsprojects.com/templates/) with the [OpenAI API](https://platform.openai.com/docs/overview).
 It stores data in [PostgreSQL](https://www.postgresql.org/) and uses [pgvector](https://github.com/pgvector/pgvector) to
 write and query embeddings.
-A [GitHub Action](https://github.com/features/actions) runs tests, builds the apps, runs migrations, then deploys to
-Azure.
-
-The [devcontainer.json](./.devcontainer/devcontainer.json) file configures an environment for local development in a
-[Development Container](https://containers.dev/).
+A [GitHub Action](https://github.com/features/actions) runs tests.
 
 ## Architecture
 
@@ -26,11 +20,11 @@ The AI Starter consists of three free-running processes communicating with one P
 
 ```mermaid
 flowchart LR
-    embeddings([Azure AI embeddings])
+    embeddings([OpenAI embeddings])
     user((User))
-    app["Web App\n(Container App)"]
-    db[("PostgreSQL\n(+pgvector)")]
-    llm([Azure AI completion])
+    app["Web App"]
+    db[("PostgreSQL (+pgvector)")]
+    llm([OpenAI completion])
     
     user -- query --> app
     app -- create embedding --> embeddings
@@ -52,17 +46,17 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    embeddings([Azure AI embeddings])
+    embeddings([OpenAI embeddings])
     docs(["RSS feeds"])
-    db[("PostgreSQL\n(+pgvector)")]
-    collector["Data Collector\n(Azure Function)"]
-    analyzer["Data Analyzer\n(Azure Function)"]
+    db[("PostgreSQL (+pgvector)")]
+    collector["Data Collector"]
+    analyzer["Data Analyzer"]
     
     collector -- fetch documents --> docs
     collector -- save documents --> db
     analyzer -- retrieve documents --> db
     analyzer -- create embeddings --> embeddings
-    analyzer -- "save embeddings \n (with reference)" --> db
+    analyzer -- "save embeddings (with reference)" --> db
 
     classDef node font-weight:bold,color:white,stroke:black,stroke-width:2px;
     classDef app fill:#3185FC;
@@ -81,39 +75,40 @@ flowchart LR
 The data collector fetches documents from RSS feeds sources and stores the document text in the database.
 It also splits documents into chunks of less than 6000 tokens to ensure embedding and text completion calls stay below
 their token limits.
-The data analyzer sends document chunks to the [Azure AI Embeddings API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#embeddings)
+The data analyzer sends document chunks to the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings)
 and uses pgvector to store the embeddings in PostgreSQL.
 
 ### Web Application
 
 The web application collects the user's query and creates an embedding with the OpenAI Embeddings API.
 It then searches the PostgreSQL for similar embeddings (using pgvector) and provides the corresponding chunk of text as
-context for a query to the [Azure AI Chat Completion API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions).
+context for a query to the [OpenAI Chat Completion API](https://platform.openai.com/docs/api-reference/chat).
 
 ## Local development
 
-1.  Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-1.  Install and open [PyCharm](https://www.jetbrains.com/pycharm/).
-1.  In the PyCharm menu, choose _File > Remote Development > Dev Containers > New Dev Containers > From VCS Project_,
-    then enter `git@github.com:initialcapacity/flask-ai-starter.git` to [start the dev container](https://www.jetbrains.com/help/pycharm/connect-to-devcontainer.html#start_container_from_product)
-    in PyCharm.
-1.  Once your dev container is running, open a terminal in PyCharm (Alt/Option + F12) and run tests
-    ```shell
-    source venv/bin/activate
-    python -m unittest
-    ```
-
-1.  Copy the example environment file and fill in the necessary values.
+1.  Install [uv](https://formulae.brew.sh/formula/uv), [PostgreSQL 17](https://formulae.brew.sh/formula/postgresql@17),
+    and [pgvector](https://formulae.brew.sh/formula/pgvector).
+1.  Set up environment variables.
     ```shell
     cp .env.example .env 
     source .env
+    ```
+1.  Set up the database.
+    ```shell
+    psql postgres < databases/create_databases.sql
+    uv run alembic upgrade head
+    DATABASE_URL="postgresql://localhost:5432/ai_starter_test?user=ai_starter&password=ai_starter" uv run alembic upgrade head
+    ```
+1.  Run tests.
+    ```shell
+    uv run -m unittest
     ```
 
 1.  Run the collector and the analyzer to populate the database, then run the app and navigate to
     [localhost:5001](http://localhost:5001).
 
     ```shell
-    python collect.py
-    python analyze.py
-    python -m starter
+    uv run -m starter.collect
+    uv run -m starter.analyze
+    uv run -m starter
     ```
